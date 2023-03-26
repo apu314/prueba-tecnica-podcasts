@@ -1,0 +1,9 @@
+function FourOhFour() {
+  return (
+    <div className='flex justify-center'>
+      <h1 className='text-2xl'>Page not found</h1>
+    </div>
+  )
+}
+
+export default FourOhFour

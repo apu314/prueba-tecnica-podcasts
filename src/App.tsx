@@ -2,6 +2,7 @@ import './styles/globals.css'
 
 import { Cache, SWRConfig } from 'swr'
 
+import MainLayout from './layouts/mainLayout'
 import { fetcher } from './lib/fetcher'
 import Routes from './Routes'
 
@@ -29,7 +30,9 @@ const App = () => {
           refreshInterval: 1000 * 60 * 60 * 24 // refreshes each day
         }}
       >
-        <Routes />
+        <MainLayout>
+          <Routes />
+        </MainLayout>
       </SWRConfig>
     </>
   )
