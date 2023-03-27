@@ -8,7 +8,7 @@ import MainLayout from './layouts/mainLayout'
 import { fetcher } from './lib/fetcher'
 import Routes from './Routes'
 
-export const isLoading = signal(false)
+export const isLoadingSignal = signal(false)
 
 const App = () => {
   return (

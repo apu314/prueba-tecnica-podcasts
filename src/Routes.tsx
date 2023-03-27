@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import React from 'react'
 import { Route, Switch, useLocation } from 'wouter'
 
-import { isLoading } from './App'
+import { isLoadingSignal } from './App'
 import Home from './pages'
 import FourOhFour from './pages/404'
 import Podcast from './pages/podcast'
@@ -17,12 +17,12 @@ const CustomSwitch: FC<CustomSwitchProps> = ({ children }) => {
 
   useEffect(() => {
     setPrevLoc(location)
-    isLoading.value = true
+    isLoadingSignal.value = true
     if (location === prevLoc) setPrevLoc('')
   }, [location])
 
   useEffect(() => {
-    setTimeout(() => (isLoading.value = false), 1000)
+    setTimeout(() => (isLoadingSignal.value = false), 1000)
   }, [prevLoc])
 
   return <Switch>{children}</Switch>

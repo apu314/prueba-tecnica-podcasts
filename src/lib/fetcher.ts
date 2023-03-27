@@ -1,10 +1,10 @@
-import { isLoading } from '../App'
+import { isLoadingSignal } from '../App'
 
 export const fetcher = (...args: unknown[]) => {
-  isLoading.value = true
+  isLoadingSignal.value = true
 
   return fetch(...args).then((res) => {
-    isLoading.value = false
+    isLoadingSignal.value = false
     return res.json()
   })
 }

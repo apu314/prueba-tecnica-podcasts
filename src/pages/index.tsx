@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react'
-import useSWR from 'swr'
 
+import { isLoadingSignal } from '../App'
 import { Podcast } from '../components/podcast'
 import Search from '../components/Search'
+import { usePodcasts } from '../hooks'
 import type { Podcast as IPodcast } from '../types/FilteredPodcastsResponse'
-import type { FilteredPodcastsResponse } from '../types/FilteredPodcastsResponse'
-
-export const PODCASTS_URL = `https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json`
 
 function Index() {
-  const [podcasts, setPodcasts] = useState<IPodcast[]>([])
+  const { podcasts, isLoading, error } = usePodcasts()
   const [filteredPodcasts, setFilteredPodcasts] = useState<IPodcast[]>([]) // TODO: Es necesario tener dos estados que contienen lo mismo? usando data como fuente de datos cambiante y podcasts como los podcasts que se van a mostrar (filtrando también), suficiente.
   const [filter, setFilter] = useState<string>('')
-  const { data, error, isLoading } = useSWR<FilteredPodcastsResponse>(PODCASTS_URL)
 
   useEffect(() => {
-    error && console.log(error)
-    data && setPodcasts(data.feed.entry)
-  }, [data])
+    if (error) console.log(error)
+    if (isLoading) {
+      isLoadingSignal.value = true
+    } else {
+      isLoadingSignal.value = false
+    }
+  }, [isLoading])
 
   useEffect(() => {
     setFilteredPodcasts(podcasts)
@@ -43,7 +44,6 @@ function Index() {
       <Search onSearch={handleFilterChange} resultsCount={filteredPodcasts.length} />
 
       <div className='grid gap-4 gap-y-14 grid-cols-3 grid-rows-3 pt-8'>
-        {(isLoading || error) && <h3>Loading...</h3>}
         {filteredPodcasts &&
           filteredPodcasts.map((podcast, index) => (
             <Podcast key={index} podcast={podcast} />
