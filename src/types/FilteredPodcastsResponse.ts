@@ -1,4 +1,4 @@
-export interface FilteredPodcasts {
+export interface FilteredPodcastsResponse {
   feed: Feed
 }
 

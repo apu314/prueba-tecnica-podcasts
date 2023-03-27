@@ -1,10 +1,13 @@
 import './styles/globals.css'
 
+import { signal } from '@preact/signals-react'
 import { Cache, SWRConfig } from 'swr'
 
 import MainLayout from './layouts/mainLayout'
 import { fetcher } from './lib/fetcher'
 import Routes from './Routes'
+
+export const isLoading = signal(false)
 
 function localStorageProvider() {
   // When initializing, we restore the data from `localStorage` into a map.
