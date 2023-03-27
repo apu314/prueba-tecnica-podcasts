@@ -1,52 +1,111 @@
-import { useEffect, useState } from 'react'
-import useSWR from 'swr'
-import { DefaultParams, RouteComponentProps } from 'wouter'
+import dateFormatter from 'date-and-time'
+import { useEffect } from 'react'
+import { DefaultParams, Link, RouteComponentProps } from 'wouter'
 
+import { isLoadingSignal } from '../../App'
 import { PodcastInfo } from '../../components/podcast'
-import { PodcastDetail, PodcastDetailResponse } from '../../types/PodcastDetailResponse'
+import usePodcastDetail from '../../hooks/usePodcastDetail'
 
 function Podcast(props: RouteComponentProps<DefaultParams>) {
   const { params } = props
-  console.log(params.podcastId)
 
-  const PODCAST_URL = `https://itunes.apple.com/lookup?id=${params.podcastId}&media=podcast&entity=podcastEpisode&limit=20`
-  const PODCAST_URL_ALL_ORIGINS = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-    PODCAST_URL
-  )}`
+  const { podcastEpisodes, isLoading, error } = usePodcastDetail(params.podcastId!)
 
-  const [podcast, setPodcast] = useState<PodcastDetail[]>()
-  const { data, error, isLoading } = useSWR<PodcastDetailResponse>(
-    PODCAST_URL_ALL_ORIGINS
-  )
+  useEffect(() => {
+    if (isLoading) {
+      isLoadingSignal.value = true
+    } else {
+      isLoadingSignal.value = false
+    }
+  }, [isLoading])
 
   useEffect(() => {
     error && console.log(error)
-    console.log('Podcast detail --> ', data)
-    data && setPodcast(data.results)
-  }, [data])
+  }, [podcastEpisodes])
 
-  useEffect(() => {
-    podcast && console.log(podcast)
-  }, [podcast])
+  const getDate = (date: Date) => dateFormatter.format(new Date(date), 'DD/MM/YYYY')
+  const getDuration = (miliseconds: number) => {
+    let seconds = Math.floor(miliseconds / 1000)
+    let minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
 
-  if (error || isLoading) return <>Loading...</>
+    seconds = seconds % 60
+    minutes = minutes % 60
+
+    const convertToTwoDigits = (num: number) => num.toString().padStart(2, '0')
+
+    return hours > 0
+      ? `${convertToTwoDigits(hours)}:${convertToTwoDigits(minutes)}:${convertToTwoDigits(
+          seconds
+        )}`
+      : `${convertToTwoDigits(minutes)}:${convertToTwoDigits(seconds)}`
+  }
 
   return (
     <>
-      {podcast && (
-        <div className='flex'>
+      {podcastEpisodes && (
+        <div className='flex gap-x-8'>
           <div className='w-full md:w-[30%]'>
             <PodcastInfo
-              author={podcast[0].artistName || podcast[0].trackName}
-              title={podcast[0].trackName}
-              description={podcast[0].description}
-              image={podcast[0].artworkUrl100!}
+              author={
+                podcastEpisodes.episodes[0].artistName ||
+                podcastEpisodes.episodes[0].trackName
+              }
+              title={podcastEpisodes.episodes[0].trackName}
+              description={podcastEpisodes.episodes[0].description}
+              image={podcastEpisodes.episodes[0].artworkUrl100!}
             />
           </div>
 
-          <div>
-            <div className='episodesCount '>
-              <span>Episodes: {podcast.length - 1}</span>
+          <div className='w-full flex flex-col gap-y-4'>
+            <div className='card p-4 w-full'>
+              <span className='text-xl font-semibold'>
+                Episodes: {podcastEpisodes.episodes.length - 1}
+              </span>
+            </div>
+
+            <div className='card p-4 w-full'>
+              <table className='w-full text-sm text-left text-gray-500'>
+                <thead className='text-gray-700 uppercase border-b-2'>
+                  <tr>
+                    <th scope='col' className='px-6 py-3'>
+                      Title
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
+                      Date
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
+                      Duration
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {podcastEpisodes.episodes.map((episode, index) => {
+                    if (index === 0) return
+                    const isLast = index === podcastEpisodes.episodes.length - 1
+
+                    return (
+                      <tr
+                        key={episode.trackId}
+                        className={`even:bg-gray-100 ${
+                          !isLast ? 'border-b' : ''
+                        } text-center`}
+                      >
+                        <td className='px-6 py-4 text-blue hover:underline text-left'>
+                          <Link
+                            href={`/podcast/${params.podcastId}/episode/${episode.trackId}`}
+                          >
+                            <a>{episode.trackName}</a>
+                          </Link>
+                        </td>
+                        <td>{getDate(episode.releaseDate)}</td>
+                        <td>{getDuration(episode.trackTimeMillis)}</td>
+                      </tr>
+                    )
+                  })}
+                  <tr></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

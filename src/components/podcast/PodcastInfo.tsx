@@ -11,19 +11,19 @@ const PodcastInfo: FC<Props> = ({ author, description, image, title }) => {
   return (
     <div className='border shadow-md p-4 flex flex-col items-center'>
       <picture>
-        <img src={image} alt={title} />
+        <img className='rounded' src={image} alt={title} />
       </picture>
 
-      <hr className='h-1 border-b-black' />
+      <div className='border-b h-4 w-full' />
 
-      <div>
-        <div className='title'>{title}</div>
-        <div className='author'>by {author}</div>
+      <div className='text-sm w-full px-4 py-2'>
+        <div className='title font-bold'>{title}</div>
+        <div className='author italic'>by {author}</div>
       </div>
 
       {description && (
         <>
-          <hr />
+          <div className='border-b h-4 w-full' />
 
           <div className='description'>
             <span>Description:</span>
