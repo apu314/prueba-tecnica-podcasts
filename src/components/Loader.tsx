@@ -2,12 +2,12 @@ import { effect } from '@preact/signals-react'
 import { useEffect, useState } from 'react'
 import { Rings } from 'react-loader-spinner'
 
-import { isLoading } from '../App'
+import { isLoadingSignal } from '../App'
 
 const Loader = () => {
   const [state, setState] = useState(false)
 
-  useEffect(() => effect(() => setState(isLoading.value)), [])
+  useEffect(() => effect(() => setState(isLoadingSignal.value)), [])
 
   return (
     <>
