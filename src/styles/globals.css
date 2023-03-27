@@ -21,3 +21,10 @@
     @apply my-0 mx-auto;
   }
 }
+
+
+@layer components {
+  .card {
+    @apply border shadow-md rounded;
+  }
+}
